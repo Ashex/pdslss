@@ -1,5 +1,6 @@
 import {
   getPublicKeyFromDidController,
+  getPublicKeyFromDidController,
   P256PublicKey,
   Secp256k1PublicKey,
   type PublicKey,
@@ -7,6 +8,9 @@ import {
 import { getAtprotoVerificationMaterial } from "@atcute/identity";
 import { WebDidDocumentResolver } from "@atcute/identity-resolver";
 import type { AtprotoDid } from "@atcute/lexicons/syntax";
+import { getAtprotoVerificationMaterial } from "@atcute/identity";
+import { WebDidDocumentResolver } from "@atcute/identity-resolver";
+import type { AtprotoDid, Did } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
 
 export type VerificationLevel = "service-signature" | "cid-integrity";
@@ -40,6 +44,7 @@ export const resolveServiceSigningKey = async (serviceDid: string): Promise<Publ
     throw new Error("DID document has no #atproto verificationMethod");
   }
 
+  const found = getPublicKeyFromDidController(material);
   const found = getPublicKeyFromDidController(material);
 
   let key: PublicKey;

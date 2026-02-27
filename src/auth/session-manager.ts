@@ -6,7 +6,7 @@ import {
   OAuthUserAgent,
   type Session,
 } from "@atcute/oauth-browser-client";
-import { discoverStratosEnrollment, setStratosActive, setStratosEnrollment } from "../stratos";
+import { discoverEnrollment, setStratosActive, setStratosEnrollment } from "../stratos";
 import { resolveDidDoc } from "../utils/api";
 import { agent as currentAgent, Sessions, setAgent, setSessions } from "./state";
 

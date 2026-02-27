@@ -1,7 +1,7 @@
 export { verifyEnrollmentAttestation } from "./attestation";
 export type { AttestationResult } from "./attestation";
 export { createServiceClient, resolveServiceUrl } from "./client";
-export { discoverStratosEnrollment } from "./discovery";
+export { discoverEnrollment } from "./discovery";
 export { createServiceFetchHandler } from "./dpop-fetch";
 export {
   setStratosActive,

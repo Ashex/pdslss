@@ -16,6 +16,7 @@ export const createServiceFetchHandler = (
   authenticatedHandler: FetchHandler,
   serviceUrl: string,
 ): FetchHandlerObject => {
+  const fetch = buildFetchHandler(handler);
   return {
     async handle(pathname: string, init?: RequestInit): Promise<Response> {
       const url = new URL(pathname, serviceUrl);
