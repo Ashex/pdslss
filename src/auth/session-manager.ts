@@ -92,7 +92,7 @@ export const retrieveSession = async (): Promise<void> => {
     setAgent(userAgent);
     setStratosActive(false);
     const capturedDid = userAgent.sub;
-    discoverStratosEnrollment(capturedDid, userAgent.handle)
+    discoverStratosEnrollment(capturedDid, userAgent.handle.bind(userAgent))
       .then((enrollment) => {
         if (currentAgent()?.sub === capturedDid) {
           setStratosEnrollment(enrollment);

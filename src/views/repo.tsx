@@ -188,7 +188,7 @@ export const RepoView = () => {
     // discover the browsed user's stratos enrollment so the navbar can
     // show/hide the stratos toggle and warn about service mismatches
     try {
-      const target = await discoverStratosEnrollment(did as Did);
+      const target = await discoverStratosEnrollment(did as Did, pds);
       setTargetEnrollment(target);
     } catch {
       setTargetEnrollment(null);

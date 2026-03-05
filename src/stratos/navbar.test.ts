@@ -12,9 +12,11 @@ import type { StratosEnrollment } from "./state";
 
 // #region predicates under test
 
-/** toggle button is visible iff enrollment is non-null */
-const isToggleVisible = (enrollment: StratosEnrollment | null | undefined): boolean =>
-  enrollment != null;
+/** toggle button is visible iff both own and target enrollment are non-null */
+const isToggleVisible = (
+  ownEnrollment: StratosEnrollment | null | undefined,
+  targetEnrollment: StratosEnrollment | null | undefined,
+): boolean => ownEnrollment != null && targetEnrollment != null;
 
 /** boundary chips are visible iff enrollment is non-null AND active is true AND boundaries non-empty */
 const areBoundaryChipsVisible = (
@@ -55,29 +57,47 @@ const arbNullableEnrollment = fc.option(arbEnrollment(), { nil: null });
 
 describe("navbar visibility predicates", () => {
   describe("isToggleVisible", () => {
-    it("is true for any non-null enrollment", () => {
+    it("is true when both enrollments are non-null", () => {
       fc.assert(
-        fc.property(arbEnrollment(), (enrollment) => {
-          expect(isToggleVisible(enrollment)).toBe(true);
+        fc.property(arbEnrollment(), arbEnrollment(), (own, target) => {
+          expect(isToggleVisible(own, target)).toBe(true);
         }),
         { numRuns: 100 },
       );
     });
 
-    it("is false when enrollment is null", () => {
-      expect(isToggleVisible(null)).toBe(false);
-    });
-
-    it("is false when enrollment is undefined", () => {
-      expect(isToggleVisible(undefined)).toBe(false);
-    });
-
-    it("matches enrollment != null for all combinations", () => {
+    it("is false when own enrollment is null", () => {
       fc.assert(
-        fc.property(arbNullableEnrollment, (enrollment) => {
-          expect(isToggleVisible(enrollment)).toBe(enrollment != null);
+        fc.property(arbEnrollment(), (target) => {
+          expect(isToggleVisible(null, target)).toBe(false);
         }),
-        { numRuns: 100 },
+        { numRuns: 50 },
+      );
+    });
+
+    it("is false when target enrollment is null", () => {
+      fc.assert(
+        fc.property(arbEnrollment(), (own) => {
+          expect(isToggleVisible(own, null)).toBe(false);
+        }),
+        { numRuns: 50 },
+      );
+    });
+
+    it("is false when own enrollment is undefined", () => {
+      expect(isToggleVisible(undefined, null)).toBe(false);
+    });
+
+    it("is false when both are null", () => {
+      expect(isToggleVisible(null, null)).toBe(false);
+    });
+
+    it("matches own != null && target != null for all combinations", () => {
+      fc.assert(
+        fc.property(arbNullableEnrollment, arbNullableEnrollment, (own, target) => {
+          expect(isToggleVisible(own, target)).toBe(own != null && target != null);
+        }),
+        { numRuns: 200 },
       );
     });
   });
