@@ -21,9 +21,9 @@ const getVersion = (): string => {
       return `v${version}.dev${commits}+g${hash}${dirty ? "-dirty" : ""}`;
     }
 
-    return `v0.0.0.dev+g${describe}`;
+    return `v0.0.0.dev+g${describe}-stratos`;
   } catch {
-    return "v0.0.0-unknown";
+    return "v0.0.0-unknown-stratos";
   }
 };
 
