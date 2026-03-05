@@ -23,7 +23,7 @@ const configs = {
           logo_uri: `${baseUrl}/favicon.ico`,
           redirect_uris: [`${baseUrl}/`],
           scope:
-            "atproto repo:*?action=create repo:*?action=update repo:*?action=delete blob:*/* repo:app.stratos.actor.enrollment repo:app.stratos.feed.post",
+            "atproto repo:*?action=create repo:*?action=update repo:*?action=delete blob:*/* repo:zone.stratos.actor.enrollment repo:zone.stratos.feed.post",
           grant_types: ["authorization_code", "refresh_token"],
           response_types: ["code"],
           token_endpoint_auth_method: "none",
