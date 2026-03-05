@@ -1,21 +1,19 @@
-import type { FetchHandlerObject } from "@atcute/client";
-import type { OAuthUserAgent } from "@atcute/oauth-browser-client";
+import type { FetchHandler, FetchHandlerObject } from "@atcute/client";
 
 /**
- * creates a fetch handler that targets a specific service URL using
- * the DPoP credentials from an existing OAuthUserAgent session.
+ * creates a fetch handler that routes XRPC calls to a specific service URL
+ * using an existing authenticated handler for DPoP credentials.
  *
- * OAuthUserAgent.handle() resolves relative pathnames against session.info.aud
- * (the user's PDS). by passing an absolute URL instead, the base is ignored per
- * the URL spec, so the request goes to our target service. the underlying DPoP
- * fetch derives htu from the actual request URL, so proofs are valid for any origin.
+ * works by resolving relative pathnames against the target service URL.
+ * the underlying DPoP fetch derives htu from the actual request URL,
+ * so proofs are valid for any origin without reconfiguration.
  *
- * @param agent the authenticated OAuthUserAgent (provides DPoP key + access token)
- * @param serviceUrl the target service base URL (e.g. "https://stratos.example.com")
- * @returns a FetchHandlerObject that routes XRPC calls to the target service
+ * @param authenticatedHandler a handler that attaches auth headers (DPoP proof + access token)
+ * @param serviceUrl the target Stratos service base URL
+ * @returns a FetchHandlerObject that routes calls to the target service
  */
 export const createServiceFetchHandler = (
-  agent: OAuthUserAgent,
+  authenticatedHandler: FetchHandler,
   serviceUrl: string,
 ): FetchHandlerObject => {
   return {
@@ -24,7 +22,7 @@ export const createServiceFetchHandler = (
       const headers = new Headers(init?.headers);
       // ngrok free tier returns an HTML interstitial for browser User-Agents
       headers.set("ngrok-skip-browser-warning", "1");
-      return agent.handle(url.href, { ...init, headers });
+      return authenticatedHandler(url.href, { ...init, headers });
     },
   };
 };

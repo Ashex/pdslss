@@ -8,7 +8,7 @@ import {
 } from "@atcute/oauth-browser-client";
 import { discoverStratosEnrollment, setStratosActive, setStratosEnrollment } from "../stratos";
 import { resolveDidDoc } from "../utils/api";
-import { Sessions, setAgent, setSessions } from "./state";
+import { agent as currentAgent, Sessions, setAgent, setSessions } from "./state";
 
 export const saveSessionToStorage = (sessions: Sessions) => {
   localStorage.setItem("sessions", JSON.stringify(sessions));
@@ -91,9 +91,18 @@ export const retrieveSession = async (): Promise<void> => {
     const userAgent = new OAuthUserAgent(session);
     setAgent(userAgent);
     setStratosActive(false);
-    discoverStratosEnrollment(userAgent.sub)
-      .then(setStratosEnrollment)
-      .catch(() => setStratosEnrollment(null));
+    const capturedDid = userAgent.sub;
+    discoverStratosEnrollment(capturedDid, userAgent.handle)
+      .then((enrollment) => {
+        if (currentAgent()?.sub === capturedDid) {
+          setStratosEnrollment(enrollment);
+        }
+      })
+      .catch(() => {
+        if (currentAgent()?.sub === capturedDid) {
+          setStratosEnrollment(null);
+        }
+      });
   }
 };
 

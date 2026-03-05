@@ -39,7 +39,7 @@ export const createServiceClient = (agent: OAuthUserAgent, serviceUrl?: string):
   const url = serviceUrl ?? (stratosActive() ? stratosEnrollment()?.service : undefined);
   if (url) {
     return new Client({
-      handler: createServiceFetchHandler(agent, url),
+      handler: createServiceFetchHandler(agent.handle, url),
     });
   }
   return new Client({ handler: agent });

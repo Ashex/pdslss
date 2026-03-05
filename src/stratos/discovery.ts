@@ -1,7 +1,9 @@
+import type { FetchHandler } from "@atcute/client";
 import { Client, simpleFetchHandler } from "@atcute/client";
-import type { Did } from "@atcute/lexicons";
-import { resolvePDS } from "../utils/api";
 import type { StratosEnrollment } from "./state";
+
+const ENROLLMENT_COLLECTION = "zone.stratos.actor.enrollment";
+const ENROLLMENT_RKEY = "self";
 
 const isEnrollmentRecord = (
   val: unknown,
@@ -15,14 +17,21 @@ const isEnrollmentRecord = (
   return typeof obj.service === "string" && typeof obj.createdAt === "string";
 };
 
-export const discoverStratosEnrollment = async (did: Did): Promise<StratosEnrollment | null> => {
-  const pds = await resolvePDS(did);
-  const rpc = new Client({ handler: simpleFetchHandler({ service: pds }) });
+export const discoverStratosEnrollment = async (
+  did: string,
+  pdsUrlOrHandler: string | FetchHandler,
+): Promise<StratosEnrollment | null> => {
+  const handler =
+    typeof pdsUrlOrHandler === "string" ?
+      simpleFetchHandler({ service: pdsUrlOrHandler })
+    : pdsUrlOrHandler;
+
+  const rpc = new Client({ handler });
   const res = await rpc.get("com.atproto.repo.getRecord", {
     params: {
-      repo: did,
-      collection: "app.stratos.actor.enrollment",
-      rkey: "self",
+      repo: did as `did:${string}:${string}`,
+      collection: ENROLLMENT_COLLECTION,
+      rkey: ENROLLMENT_RKEY,
     },
   });
   if (!res.ok) return null;

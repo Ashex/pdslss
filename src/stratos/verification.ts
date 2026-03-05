@@ -1,11 +1,12 @@
 import {
+  getPublicKeyFromDidController,
   P256PublicKey,
-  parsePublicMultikey,
   Secp256k1PublicKey,
   type PublicKey,
 } from "@atcute/crypto";
-import { getVerificationMaterial, webDidToDocumentUrl, type DidDocument } from "@atcute/identity";
-import type { AtprotoDid, Did } from "@atcute/lexicons/syntax";
+import { getAtprotoVerificationMaterial } from "@atcute/identity";
+import { WebDidDocumentResolver } from "@atcute/identity-resolver";
+import type { AtprotoDid } from "@atcute/lexicons/syntax";
 import { verifyRecord } from "@atcute/repo";
 
 export type VerificationLevel = "service-signature" | "cid-integrity";
@@ -19,7 +20,8 @@ const signingKeyCache = new Map<string, PublicKey>();
 
 /**
  * resolves a Stratos service's signing public key from its did:web document.
- * uses the standard #atproto verificationMethod fragment per the AT Protocol DID spec.
+ * uses WebDidDocumentResolver for validated DID document fetching and
+ * getPublicKeyFromDidController for key type dispatch.
  * results are cached — the key doesn't change unless the service rotates it.
  */
 export const resolveServiceSigningKey = async (serviceDid: string): Promise<PublicKey> => {
@@ -30,21 +32,15 @@ export const resolveServiceSigningKey = async (serviceDid: string): Promise<Publ
     throw new Error(`expected did:web, got: ${serviceDid}`);
   }
 
-  const url = webDidToDocumentUrl(serviceDid as Did<"web">);
+  const resolver = new WebDidDocumentResolver();
+  const doc = await resolver.resolve(serviceDid as `did:web:${string}`);
 
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`failed to fetch DID document: ${res.status} ${res.statusText}`);
-  }
-
-  const doc = (await res.json()) as DidDocument;
-
-  const material = getVerificationMaterial(doc, "#atproto");
+  const material = getAtprotoVerificationMaterial(doc);
   if (!material) {
     throw new Error("DID document has no #atproto verificationMethod");
   }
 
-  const found = parsePublicMultikey(material.publicKeyMultibase);
+  const found = getPublicKeyFromDidController(material);
 
   let key: PublicKey;
   switch (found.type) {
@@ -54,8 +50,6 @@ export const resolveServiceSigningKey = async (serviceDid: string): Promise<Publ
     case "p256":
       key = await P256PublicKey.importRaw(found.publicKeyBytes);
       break;
-    default:
-      throw new Error(`unsupported key type: ${(found as { type: string }).type}`);
   }
 
   signingKeyCache.set(serviceDid, key);
