@@ -16,6 +16,6 @@ WORKDIR /build
 RUN pnpm install
 RUN pnpm build
 
-COPY /build/dist/* /app/
+RUN cp /build/dist/* /app/
 
 VOLUME /app
