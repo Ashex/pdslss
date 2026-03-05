@@ -3,6 +3,8 @@ FROM node:alpine
 ENV APP_DOMAIN="pdsls.northsky.social"
 ENV APP_PROTOCOL="https"
 
+RUN mkdir -p /app
+
 RUN apk add --no-cache git
 RUN npm install -g pnpm
 
