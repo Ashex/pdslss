@@ -23,12 +23,12 @@ export const GRANULAR_SCOPES = [
   },
   {
     id: "stratos-enrollment",
-    scope: "repo:app.stratos.actor.enrollment",
+    scope: "repo:zone.stratos.actor.enrollment",
     label: "Stratos enrollment",
   },
   {
     id: "stratos-posts",
-    scope: "repo:app.stratos.feed.post",
+    scope: "repo:zone.stratos.feed.post?action=create&action=delete",
     label: "Stratos posts",
   },
 ];

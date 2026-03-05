@@ -38,7 +38,7 @@ describe("scope utility properties", () => {
       );
     });
 
-    it("contains repo:app.stratos.feed.post when stratos-posts is selected", () => {
+    it("contains stratos post scope when stratos-posts is selected", () => {
       fc.assert(
         fc.property(arbScopeIdSet, (selected) => {
           // ensure stratos-posts is in the set
@@ -47,13 +47,13 @@ describe("scope utility properties", () => {
 
           const result = buildScopeString(withStratosPosts);
           const tokens = result.split(" ");
-          expect(tokens).toContain("repo:app.stratos.feed.post");
+          expect(tokens).toContain("repo:zone.stratos.feed.post?action=create&action=delete");
         }),
         { numRuns: 200 },
       );
     });
 
-    it("does not contain repo:app.stratos.feed.post when stratos-posts is not selected", () => {
+    it("does not contain stratos post scope when stratos-posts is not selected", () => {
       fc.assert(
         fc.property(arbScopeIdSet, (selected) => {
           const withoutStratosPosts = new Set(selected);
@@ -61,7 +61,7 @@ describe("scope utility properties", () => {
 
           const result = buildScopeString(withoutStratosPosts);
           const tokens = result.split(" ");
-          expect(tokens).not.toContain("repo:app.stratos.feed.post");
+          expect(tokens).not.toContain("repo:zone.stratos.feed.post?action=create&action=delete");
         }),
         { numRuns: 200 },
       );
