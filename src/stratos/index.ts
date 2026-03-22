@@ -11,6 +11,6 @@ export {
   stratosEnrollment,
   targetEnrollment,
 } from "./state";
-export type { StratosEnrollment } from "./state";
+export type { ServiceAttestation, StratosEnrollment } from "./state";
 export { verifyStratosRecord } from "./verification";
 export type { StratosVerificationResult, VerificationLevel } from "./verification";

@@ -42,13 +42,21 @@ const arbUrl = fc.webUrl({ withQueryParameters: false, withFragments: false });
 
 const arbBoundary = fc.record({ value: fc.string({ minLength: 1, maxLength: 50 }) });
 
+const arbAttestation = fc.record({
+  sig: fc.constant(new Uint8Array([1, 2, 3])),
+  signingKey: fc.constant("did:key:zDnaeservice"),
+});
+
 const arbEnrollment = (
   boundaryCount: { minLength?: number; maxLength?: number } = { minLength: 0, maxLength: 10 },
 ) =>
   fc.record({
     service: arbUrl,
     boundaries: fc.array(arbBoundary, boundaryCount),
+    signingKey: fc.constant("did:key:zDnaeuser"),
+    attestation: arbAttestation,
     createdAt: fc.constant("2024-01-01T00:00:00.000Z"),
+    rkey: fc.constant("did:web:stratos.example.com"),
   });
 
 const arbNullableEnrollment = fc.option(arbEnrollment(), { nil: null });

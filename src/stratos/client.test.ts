@@ -22,7 +22,10 @@ const arbDid = fc.string({ minLength: 5, maxLength: 30 }).map((s) => `did:plc:${
 const makeEnrollment = (serviceUrl: string): StratosEnrollment => ({
   service: serviceUrl,
   boundaries: [],
+  signingKey: "did:key:zDnaeuser",
+  attestation: { sig: new Uint8Array([1, 2, 3]), signingKey: "did:key:zDnaeservice" },
   createdAt: new Date().toISOString(),
+  rkey: "did:web:stratos.example.com",
 });
 
 const arbEnrollment = arbUrl.map(makeEnrollment);
