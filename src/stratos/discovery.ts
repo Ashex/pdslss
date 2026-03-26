@@ -1,5 +1,7 @@
+import "@atcute/atproto";
 import type { FetchHandler } from "@atcute/client";
 import { Client, simpleFetchHandler } from "@atcute/client";
+import { serviceDIDToRkey } from "./client";
 import type { ServiceAttestation, StratosEnrollment } from "./state";
 
 const ENROLLMENT_COLLECTION = "zone.stratos.actor.enrollment";
@@ -51,16 +53,24 @@ const extractRkey = (uri: string): string => {
   return parts[parts.length - 1];
 };
 
-export const discoverStratosEnrollment = async (
+/**
+ * discovers all Stratos enrollments by listing enrollment records
+ * from the user's PDS via com.atproto.repo.listRecords.
+ *
+ * accepts either a PDS URL string (creates an unauthenticated client)
+ * or an existing FetchHandler for authenticated/custom transports.
+ */
+export const discoverEnrollments = async (
   did: string,
   pdsUrlOrHandler: string | FetchHandler,
-): Promise<StratosEnrollment | null> => {
+): Promise<StratosEnrollment[]> => {
   const handler =
-    typeof pdsUrlOrHandler === "string" ?
-      simpleFetchHandler({ service: pdsUrlOrHandler })
-    : pdsUrlOrHandler;
+    typeof pdsUrlOrHandler === "string"
+      ? simpleFetchHandler({ service: pdsUrlOrHandler })
+      : pdsUrlOrHandler;
 
   const rpc = new Client({ handler });
+
   const res = await rpc.get("com.atproto.repo.listRecords", {
     params: {
       repo: did as `did:${string}:${string}`,
@@ -68,12 +78,66 @@ export const discoverStratosEnrollment = async (
       limit: 100,
     },
   });
-  if (!res.ok) return null;
 
+  if (!res.ok) return [];
+
+  const enrollments: StratosEnrollment[] = [];
   for (const record of res.data.records) {
     const rkey = extractRkey(record.uri);
     const enrollment = parseEnrollmentRecord(record.value, rkey);
-    if (enrollment) return enrollment;
+    if (enrollment) {
+      enrollments.push(enrollment);
+    }
   }
-  return null;
+  return enrollments;
 };
+
+/**
+ * discovers a single Stratos enrollment from the user's PDS.
+ * convenience wrapper around discoverEnrollments that returns the first match.
+ */
+export const discoverEnrollment = async (
+  did: string,
+  pdsUrlOrHandler: string | FetchHandler,
+): Promise<StratosEnrollment | null> => {
+  const enrollments = await discoverEnrollments(did, pdsUrlOrHandler);
+  return enrollments[0] ?? null;
+};
+
+/**
+ * discovers a specific Stratos enrollment by the service's DID.
+ * uses com.atproto.repo.getRecord with the service DID as the rkey
+ * for direct O(1) lookup instead of listing all records.
+ */
+export const getEnrollmentByServiceDid = async (
+  did: string,
+  pdsUrlOrHandler: string | FetchHandler,
+  serviceDid: string,
+): Promise<StratosEnrollment | null> => {
+  const handler =
+    typeof pdsUrlOrHandler === "string"
+      ? simpleFetchHandler({ service: pdsUrlOrHandler })
+      : pdsUrlOrHandler;
+
+  const rpc = new Client({ handler });
+  const rkey = serviceDIDToRkey(serviceDid);
+
+  try {
+    const res = await rpc.get("com.atproto.repo.getRecord", {
+      params: {
+        repo: did as `did:${string}:${string}`,
+        collection: ENROLLMENT_COLLECTION,
+        rkey,
+      },
+    });
+
+    if (!res.ok) return null;
+
+    return parseEnrollmentRecord(res.data.value, rkey);
+  } catch {
+    return null;
+  }
+};
+
+/** @deprecated use discoverEnrollment instead */
+export const discoverStratosEnrollment = discoverEnrollment;
