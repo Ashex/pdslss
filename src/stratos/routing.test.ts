@@ -27,12 +27,8 @@ describe("serviceDIDToRkey", () => {
   });
 
   it("replaces %3A with colons (case-insensitive)", () => {
-    expect(serviceDIDToRkey("did%3Aweb%3Astratos.example.com")).toBe(
-      "did:web:stratos.example.com",
-    );
-    expect(serviceDIDToRkey("did%3aweb%3astratos.example.com")).toBe(
-      "did:web:stratos.example.com",
-    );
+    expect(serviceDIDToRkey("did%3Aweb%3Astratos.example.com")).toBe("did:web:stratos.example.com");
+    expect(serviceDIDToRkey("did%3aweb%3astratos.example.com")).toBe("did:web:stratos.example.com");
   });
 
   it("is idempotent for already-decoded DIDs", () => {

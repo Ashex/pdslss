@@ -168,7 +168,14 @@ export const fetchAndVerifyRecord = async (
   const carBytes = new Uint8Array(await res.arrayBuffer());
 
   if (options?.userSigningKey) {
-    return verifyRecordCar(carBytes, collection, rkey, did, options.userSigningKey, "user-signature");
+    return verifyRecordCar(
+      carBytes,
+      collection,
+      rkey,
+      did,
+      options.userSigningKey,
+      "user-signature",
+    );
   }
 
   return verifyRecordCar(carBytes, collection, rkey, did, options?.serviceSigningKey);

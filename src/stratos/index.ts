@@ -1,6 +1,11 @@
 export { verifyEnrollmentAttestation } from "./attestation";
 export type { AttestationResult } from "./attestation";
-export { createServiceClient, findEnrollmentByService, resolveServiceUrl, serviceDIDToRkey } from "./client";
+export {
+  createServiceClient,
+  findEnrollmentByService,
+  resolveServiceUrl,
+  serviceDIDToRkey,
+} from "./client";
 export {
   discoverEnrollment,
   discoverEnrollments,
@@ -8,7 +13,7 @@ export {
   getEnrollmentByServiceDid,
 } from "./discovery";
 export { createServiceFetchHandler } from "./dpop-fetch";
-export { buildCollectionScope, buildStratosScopes, STRATOS_SCOPES } from "./scopes";
+export { STRATOS_SCOPES, buildCollectionScope, buildStratosScopes } from "./scopes";
 export type { StratosScopes } from "./scopes";
 export {
   setStratosActive,

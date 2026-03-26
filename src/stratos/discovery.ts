@@ -65,9 +65,9 @@ export const discoverEnrollments = async (
   pdsUrlOrHandler: string | FetchHandler,
 ): Promise<StratosEnrollment[]> => {
   const handler =
-    typeof pdsUrlOrHandler === "string"
-      ? simpleFetchHandler({ service: pdsUrlOrHandler })
-      : pdsUrlOrHandler;
+    typeof pdsUrlOrHandler === "string" ?
+      simpleFetchHandler({ service: pdsUrlOrHandler })
+    : pdsUrlOrHandler;
 
   const rpc = new Client({ handler });
 
@@ -115,9 +115,9 @@ export const getEnrollmentByServiceDid = async (
   serviceDid: string,
 ): Promise<StratosEnrollment | null> => {
   const handler =
-    typeof pdsUrlOrHandler === "string"
-      ? simpleFetchHandler({ service: pdsUrlOrHandler })
-      : pdsUrlOrHandler;
+    typeof pdsUrlOrHandler === "string" ?
+      simpleFetchHandler({ service: pdsUrlOrHandler })
+    : pdsUrlOrHandler;
 
   const rpc = new Client({ handler });
   const rkey = serviceDIDToRkey(serviceDid);
