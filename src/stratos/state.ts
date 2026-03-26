@@ -1,9 +1,17 @@
 import { createSignal } from "solid-js";
 
+export interface ServiceAttestation {
+  sig: Uint8Array;
+  signingKey: string;
+}
+
 export interface StratosEnrollment {
   service: string;
   boundaries: Array<{ value: string }>;
+  signingKey: string;
+  attestation: ServiceAttestation;
   createdAt: string;
+  rkey: string;
 }
 
 // undefined = not yet checked, null = checked and not enrolled

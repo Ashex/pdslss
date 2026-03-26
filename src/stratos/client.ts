@@ -6,6 +6,26 @@ import { createServiceFetchHandler } from "./dpop-fetch";
 import { stratosActive, stratosEnrollment } from "./state";
 
 /**
+ * converts a service DID to a valid AT Protocol record key.
+ * replaces percent-encoded colons (%3A) with literal colons,
+ * which are valid rkey characters.
+ */
+export const serviceDIDToRkey = (serviceDid: string): string => {
+  return serviceDid.replace(/%3A/gi, ":");
+};
+
+/**
+ * finds the enrollment matching a given service URL from a list of enrollments.
+ */
+export const findEnrollmentByService = (
+  enrollments: Array<{ service: string }>,
+  serviceUrl: string,
+): (typeof enrollments)[number] | null => {
+  const normalized = serviceUrl.replace(/\/$/, "");
+  return enrollments.find((e) => e.service.replace(/\/$/, "") === normalized) ?? null;
+};
+
+/**
  * resolves the service URL for the active target.
  * calls setPDS() as a side effect to update the navbar.
  *
